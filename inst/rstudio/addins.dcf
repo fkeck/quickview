@@ -1,0 +1,4 @@
+Name: Quick View
+Description: Quickly view your data.
+Binding: quickview
+Interactive: false
