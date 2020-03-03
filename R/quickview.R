@@ -20,13 +20,16 @@ quickview <- function() {
 
     last_row <- context$selection[[1]]$range$start["row"]
     first_row <- last_row
-    while (first_row > 1 && (grepl("(\\+|%>%) *$", context$contents[first_row - 1]) ||
+
+    regex_all_op <- "(\\+|-|\\*|/|\\^|%|:|\\$|@|%|<|>|=|!|&|\\||~|,) *$"
+
+    while (first_row > 1 && (grepl(regex_all_op, context$contents[first_row - 1]) ||
                              grepl("^ +$", context$contents[first_row - 1]) ||
                              context$contents[first_row - 1] == "")) {
       first_row <- first_row - 1
     }
 
-    while (last_row <= length(context$contents) && (grepl("(\\+|%>%) *$", context$contents[last_row])  ||
+    while (last_row <= length(context$contents) && (grepl(regex_all_op, context$contents[last_row])  ||
                                                     grepl("^ +$", context$contents[last_row]) ||
                                                     context$contents[last_row] == "")) {
         last_row <- last_row + 1
