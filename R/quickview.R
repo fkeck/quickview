@@ -3,6 +3,7 @@
 #'
 #' @keywords internal
 #' @importFrom rstudioapi getActiveDocumentContext
+#' @importFrom stringr str_count
 #'
 #' @name quickview
 "_PACKAGE"
@@ -18,36 +19,46 @@ quickview <- function() {
   if (identical(context$selection[[1]]$range$start,
                 context$selection[[1]]$range$end)) {
 
-    last_row <- context$selection[[1]]$range$start["row"]
-    first_row <- last_row
+    active_row <- context$selection[[1]]$range$start["row"]
 
-    regex_all_op <- "(\\+|-|\\*|/|\\^|%|:|\\$|@|%|<|>|=|!|&|\\||~|,) *$"
-
-    while (first_row > 1 && (grepl(regex_all_op, context$contents[first_row - 1]) ||
-                             grepl("^ +$", context$contents[first_row - 1]) ||
-                             context$contents[first_row - 1] == "")) {
-      first_row <- first_row - 1
+    if(grepl("^ *$", context$contents[active_row])){
+      return(invisible(0L))
     }
 
-    while (last_row <= length(context$contents) && (grepl(regex_all_op, context$contents[last_row])  ||
-                                                    grepl("^ +$", context$contents[last_row]) ||
-                                                    context$contents[last_row] == "")) {
-        last_row <- last_row + 1
-
-    }
-
-    block <- context$contents[seq.int(first_row, last_row)]
-    block <- paste(block, collapse = " ")
+    context_com <- detect_com(context$contents)
+    block_id <- context_com[active_row]
+    block <- context$contents[context_com == block_id]
+    block <- paste(block, collapse = "\n")
 
   } else {
     block <- context$selection[[1]]$text
   }
 
   comm <- paste0('View(', block, ')')
-  print(comm)
+  cat("\n", block)
   eval(parse(text = comm))
 
 }
 
+
+
+# Find blocks of code in a character vector returned by rstudioapi::getActiveDocumentContext()$content
+detect_com <- function(x){
+  regex_op <- "(\\+|-|\\*|/|\\^|%|:|\\$|@|%|<|>|=|!|&|\\||~|,) *$"
+  debt_par <- cumsum(sapply(x, stringr::str_count, pattern = "\\(") - sapply(x, stringr::str_count, pattern = "\\)"))
+  debt_sqb <- cumsum(sapply(x, stringr::str_count, pattern = "\\[") - sapply(x, stringr::str_count, pattern = "\\]"))
+
+  blocks <- vector("integer", length(x))
+  k <- 1
+  for(i in seq_along(blocks)){
+    if(debt_par[i] != 0 || debt_sqb[i] != 0 || grepl(regex_op, x[i]) || grepl("^ *$", x[i]) ) {
+      blocks[i] <- k
+    } else {
+      blocks[i] <- k
+      k <- k + 1L
+    }
+  }
+  return(blocks)
+}
 
 
