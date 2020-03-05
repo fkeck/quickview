@@ -8,5 +8,5 @@ Description: RStudio addin to quickly inspect dataframes in a View tab.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: rstudioapi
+Imports: rstudioapi, stringr
 RoxygenNote: 6.1.1
