@@ -35,7 +35,7 @@ quickview <- function() {
   }
 
   comm <- paste0('View(', block, ')')
-  cat("\n", block)
+  cat("\n", block, "\n")
   eval(parse(text = comm))
 
 }
