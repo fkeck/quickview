@@ -36,9 +36,10 @@ quickview <- function() {
 
   if(getOption("quickview.print", default = "default") == "default") {
     msg <- strsplit(block, split = "\n")[[1]]
-    if(length(msg) > 12) {
+    msg_len <- length(msg)
+    if(msg_len > 12) {
       msg <- paste(msg[1:12], collapse = "\n")
-      msg <- paste(msg, " ...")
+      msg <- paste(msg, "\n\n[\033[3m...with", msg_len - 12, "more lines...\033[23m]")
     } else {
       msg <- paste(msg, collapse = "\n")
     }
