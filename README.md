@@ -17,7 +17,7 @@ The goal of quickview is to quickly inspect your data in a View tab of RStudio. 
 You can install quickview from GitHub with devtools:
 
 ``` r
-devtools::install_github("fkeck/quickview")
+remotes::install_github("fkeck/quickview")
 ```
 Then you will probably want to assign a keyboard shortcut to the quickview command. In RStudio use Tools > Addins > Browse Addins > Keyboard shortcuts.
 
