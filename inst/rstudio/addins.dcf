@@ -1,4 +1,14 @@
-Name: Quick View
-Description: Quickly view your data.
-Binding: quickview
+Name: View data in a View tab
+Description: Quickly view your data in a View tab.
+Binding: qv_view
+Interactive: false
+
+Name: Open working directory
+Description: Quickly open your working directory.
+Binding: qv_wd
+Interactive: false
+
+Name: Open data with external software
+Description: Quickly open your objects in external softwares.
+Binding: qv_open
 Interactive: false
