@@ -4,11 +4,8 @@
 \name{quickview}
 \alias{quickview}
 \alias{quickview-package}
-\title{Open datasets in a View tab}
-\usage{
-quickview()
-}
+\title{Open data in a View tab or in external softwares}
 \description{
-RStudio addin to quickly inspect dataframes in a View tab.
+RStudio addin to quickly inspect dataframes in a View tab or open them with default CSV/text editor softwares.
 }
 \keyword{internal}
