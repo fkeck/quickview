@@ -1,5 +1,5 @@
 
-#' Open datasets in a View tab
+#' Open data in a View tab or in external softwares
 #'
 #' @keywords internal
 #' @importFrom rstudioapi getActiveDocumentContext
@@ -9,53 +9,106 @@
 "_PACKAGE"
 
 
-#' Open datasets in a View tab
+#' Open data in a View tab
+#'
+#' @export)
+#'
+qv_view <- function() {
+  block <- get_block()
+  comm <- paste0('View(', block, ')')
+  print_screen_msg(block)
+  eval(parse(text = comm))
+}
+
+
+#' Open data with default CSV/text editor))
 #'
 #' @export
 #'
-quickview <- function() {
-  context <- rstudioapi::getActiveDocumentContext()
+qv_open <- function() {
 
-  if (identical(context$selection[[1]]$range$start,
-                context$selection[[1]]$range$end)) {
+  block <- get_block()
+  print_screen_msg(block)
 
-    active_row <- context$selection[[1]]$range$start["row"]
+  eval_block <- eval(parse(text = block))
 
-    if(grepl("^ *$", context$contents[active_row])){
-      return(invisible(0L))
-    }
+  skip_col_names <-
+    (is.atomic(eval_block) && is.null(dim(eval_block))) |
+    (is.matrix(eval_block) && is.null(colnames(eval_block))) |
+    (is.array(eval_block) && length(dim(eval_block)) == 1)
 
-    context_com <- detect_com(context$contents)
-    block_id <- context_com[active_row]
-    block <- context$contents[context_com == block_id]
-    block <- paste(block, collapse = "\n")
+  skip_row_names <-
+    (is.atomic(eval_block) && is.null(attributes(eval_block))) |
+    (is.matrix(eval_block) && is.null(rownames(eval_block))) |
+    (is.factor(eval_block)) |
+    (is.array(eval_block) && length(dim(eval_block)) == 1 && is.null(names(eval_block)))
 
-  } else {
-    block <- context$selection[[1]]$text
+
+
+  if(!is.data.frame(eval_block) & !is.matrix(eval_block) & !is.atomic(eval_block)) {
+
+    eval_block <- tryCatch(as.data.frame(eval_block), error = function(e) eval_block)
+
   }
 
-  if(getOption("quickview.print", default = "default") == "default") {
-    msg <- strsplit(block, split = "\n")[[1]]
-    msg_len <- length(msg)
-    if(msg_len > 12) {
-      msg <- paste(msg[1:12], collapse = "\n")
-      msg <- paste(msg, "\n\n[\033[3m...with", msg_len - 12, "more lines...\033[23m]")
+  if(!is.data.frame(eval_block) & !is.matrix(eval_block) & !is.atomic(eval_block)) {
+
+    eval_block <- tryCatch(as.character(eval_block), error = function(e) eval_block)
+
+  }
+
+
+  # IF object is dataframe, matrix or vector of length > 1
+  if(is.data.frame(eval_block) |
+     is.matrix(eval_block) |
+     (is.atomic(eval_block) & length(eval_block) > 1)) {
+
+    ff <- tempfile(pattern = "quickview_", fileext = ".csv")
+    eval_block <- as.data.frame(eval_block)
+
+    if(!skip_row_names && !skip_col_names) {
+
+      write.csv(eval_block, ff)
+
+    } else if (!skip_row_names && skip_col_names) {
+
+      write.table(eval_block, ff, col.names = FALSE, row.names = TRUE, sep = ",")
+
+    } else if (skip_row_names && !skip_col_names) {
+
+      write.table(eval_block, ff, col.names = TRUE, row.names = FALSE, sep = ",")
+
     } else {
-      msg <- paste(msg, collapse = "\n")
-    }
-    msg <- paste0("\033[90m", msg, "\033[39m")
-    msg_header <- paste0("\033[40m\033[37m\033[1m",
-                         "            QuickView            ",
-                         "\033[22m\033[39m\033[49m")
-    msg <- paste("\n", msg_header, "\n\n", msg, "\n\n")
-  }
-  cat(msg)
 
-  comm <- paste0('View(', block, ')')
+      write.table(eval_block, ff, col.names = FALSE, row.names = FALSE, sep = ",")
+
+    }
+
+  # IF object is vector of length 1
+  } else if (is.atomic(eval_block) & length(eval_block) == 1) {
+    ff <- tempfile(pattern = "quickview_", fileext = ".txt")
+    writeLines(as.character(eval_block), ff)
+
+  # ELSE error
+  } else {
+    stop("Object not supported.")
+  }
+
+  comm <- paste0('browseURL("', ff, '")')
+  print_screen_msg(block)
   eval(parse(text = comm))
 
 }
 
+
+#' Open working directory with the file manager
+#'
+#' @export
+#'
+qv_wd <- function() {
+  comm <- paste0('browseURL("', getwd(), '")')
+  eval(parse(text = comm))
+}
 
 # Find blocks of code in a character vector returned by
 # rstudioapi::getActiveDocumentContext()$content
@@ -80,3 +133,50 @@ detect_com <- function(x){
 }
 
 
+# Uses the RStudio API to get the document context
+# And returns the active/selected block of code
+get_block <- function() {
+
+  context <- rstudioapi::getActiveDocumentContext()
+
+  if (identical(context$selection[[1]]$range$start,
+                context$selection[[1]]$range$end)) {
+
+    active_row <- context$selection[[1]]$range$start["row"]
+
+    if(grepl("^ *$", context$contents[active_row])){
+      return(invisible(0L))
+    }
+
+    context_com <- detect_com(context$contents)
+    block_id <- context_com[active_row]
+    block <- context$contents[context_com == block_id]
+    block <- paste(block, collapse = "\n")
+
+  } else {
+    block <- context$selection[[1]]$text
+  }
+  return(block)
+}
+
+
+print_screen_msg <- function(x) {
+
+  if(getOption("quickview.print", default = "default") == "default") {
+    msg <- strsplit(x, split = "\n")[[1]]
+    msg_len <- length(msg)
+    if(msg_len > 12) {
+      msg <- paste(msg[1:12], collapse = "\n")
+      msg <- paste(msg, "\n\n[\033[3m...with", msg_len - 12, "more lines...\033[23m]")
+    } else {
+      msg <- paste(msg, collapse = "\n")
+    }
+    msg <- paste0("\033[90m", msg, "\033[39m")
+    msg_header <- paste0("\033[40m\033[37m\033[1m",
+                         "            QuickView            ",
+                         "\033[22m\033[39m\033[49m")
+    msg <- paste("\n", msg_header, "\n\n", msg, "\n\n")
+    cat(msg)
+  }
+  #else : alternative print options
+}
