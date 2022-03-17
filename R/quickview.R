@@ -1,5 +1,5 @@
 
-#' Open data in a View tab or in external softwares
+#' Open data in a View tab or in external software
 #'
 #' @keywords internal
 #' @importFrom rstudioapi getActiveDocumentContext
@@ -21,14 +21,13 @@ qv_view <- function() {
 }
 
 
-#' Open data with default CSV/text editor))
+#' Open data with default CSV/text editor
 #'
 #' @export
 #'
 qv_open <- function() {
 
   block <- get_block()
-  print_screen_msg(block)
 
   eval_block <- eval(parse(text = block))
 
@@ -175,7 +174,7 @@ print_screen_msg <- function(x) {
     msg_header <- paste0("\033[40m\033[37m\033[1m",
                          "            QuickView            ",
                          "\033[22m\033[39m\033[49m")
-    msg <- paste("\n", msg_header, "\n\n", msg, "\n\n")
+    msg <- paste("\n", msg_header, "\n", msg, "\n\n")
     cat(msg)
   }
   #else : alternative print options
