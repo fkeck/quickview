@@ -15,7 +15,7 @@
 #'
 qv_view <- function() {
   block <- get_block()
-  comm <- paste0('View({', block, '})')
+  comm <- paste0('View({', block, '}, title = "', block, '")')
   print_screen_msg(block)
   eval(parse(text = comm))
 }
