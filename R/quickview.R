@@ -15,7 +15,7 @@
 #'
 qv_view <- function() {
   block <- get_block()
-  comm <- paste0('View(', block, ')')
+  comm <- paste0('View({', block, '})')
   print_screen_msg(block)
   eval(parse(text = comm))
 }
@@ -28,8 +28,7 @@ qv_view <- function() {
 qv_open <- function() {
 
   block <- get_block()
-
-  eval_block <- eval(parse(text = block))
+  eval_block <- eval(parse(text = paste0('{', block, '}')))
 
   skip_col_names <-
     (is.atomic(eval_block) && is.null(dim(eval_block))) |
