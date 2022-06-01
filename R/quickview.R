@@ -62,6 +62,8 @@ qv_open <- function() {
      (is.atomic(eval_block) & length(eval_block) > 1)) {
 
     ff <- tempfile(pattern = "quickview_", fileext = ".csv")
+    ff <- gsub("\\\\", "/", ff)
+
     eval_block <- as.data.frame(eval_block)
 
     if(!skip_row_names && !skip_col_names) {
@@ -85,6 +87,7 @@ qv_open <- function() {
   # IF object is vector of length 1
   } else if (is.atomic(eval_block) & length(eval_block) == 1) {
     ff <- tempfile(pattern = "quickview_", fileext = ".txt")
+    ff <- gsub("\\\\", "/", ff)
     writeLines(as.character(eval_block), ff)
 
   # ELSE error
