@@ -107,7 +107,7 @@ array(1:100, c(10, 10), dimnames = list(LETTERS[1:10], letters[1:10]))
 list(c("A", "B"), list(2, 3))
 
 # html coercible to character (and not to dataframe) [Text editor]
-xml2::read_html("http://had.co.nz")
+xml2::read_html("http://info.cern.ch/hypertext/WWW/TheProject.html")
 
 # zoo object coercible to dataframe [Spreadsheet]
 zoo::as.zoo(ts(rnorm(5), start = 1981, freq = 12))
