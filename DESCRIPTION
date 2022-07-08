@@ -1,10 +1,10 @@
 Package: quickview
 Type: Package
 Title: Open datasets in a View tab and external softwares
-Version: 0.2.0
+Version: 0.2.1
 Author: Francois Keck [aut, cre]
 Maintainer: Francois Keck <francois.keck@gmail.com>
-Description: RStudio addin to quickly inspect dataframes in a View tab or open them with default CSV/text editor softwares.
+Description: RStudio addin to quickly inspect data in a View tab or open them with default CSV/text editor softwares.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

@@ -68,19 +68,19 @@ qv_open <- function() {
 
     if(!skip_row_names && !skip_col_names) {
 
-      write.csv(eval_block, ff)
+      utils::write.csv(eval_block, ff)
 
     } else if (!skip_row_names && skip_col_names) {
 
-      write.table(eval_block, ff, col.names = FALSE, row.names = TRUE, sep = ",")
+      utils::write.table(eval_block, ff, col.names = FALSE, row.names = TRUE, sep = ",")
 
     } else if (skip_row_names && !skip_col_names) {
 
-      write.table(eval_block, ff, col.names = TRUE, row.names = FALSE, sep = ",")
+      utils::write.table(eval_block, ff, col.names = TRUE, row.names = FALSE, sep = ",")
 
     } else {
 
-      write.table(eval_block, ff, col.names = FALSE, row.names = FALSE, sep = ",")
+      utils::write.table(eval_block, ff, col.names = FALSE, row.names = FALSE, sep = ",")
 
     }
 
